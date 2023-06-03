@@ -1,30 +1,35 @@
-use std::iter::repeat_with;
+//use std::iter::repeat_with;
 
 use actix_web::{get, web, Responder, Result};
+use rand::{seq::SliceRandom, thread_rng};
 use serde::Serialize;
 
 #[derive(Serialize)]
 struct MsNumbers {
-    n1: i8,
-    n2: i8,
-    n3: i8,
-    n4: i8,
-    n5: i8,
-    n6: i8,
+    n1: i32,
+    n2: i32,
+    n3: i32,
+    n4: i32,
+    n5: i32,
+    n6: i32,
 }
 
 impl MsNumbers {
     fn new() -> MsNumbers {
-        let rng = fastrand::Rng::new();
-        let v: Vec<i8> = repeat_with(|| rng.i8(1..61)).take(6).collect();
+        let mut vec = Vec::new();
+        for number in 1..=60 {
+            vec.push(number);
+        }
+        let mut rng = thread_rng();
+        vec.shuffle(&mut rng);
 
         MsNumbers {
-            n1: v[0],
-            n2: v[1],
-            n3: v[2],
-            n4: v[3],
-            n5: v[4],
-            n6: v[5],
+            n1: vec[9],
+            n2: vec[19],
+            n3: vec[29],
+            n4: vec[39],
+            n5: vec[49],
+            n6: vec[59],
         }
     }
 }

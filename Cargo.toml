@@ -7,6 +7,6 @@ edition = "2021"
 
 [dependencies]
 actix-web = "4.3.1"
-fastrand = "1.9.0"
+rand = "0.8.5"
 serde = {version = "1.0.163", features = ["derive"] }
  
