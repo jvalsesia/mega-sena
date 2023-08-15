@@ -8,4 +8,4 @@ cargo run
 cargo watch -x run
 
 # test
-curl localhost:8080/bet | json_pp
+curl localhost:8080/bet/3 | json_pp

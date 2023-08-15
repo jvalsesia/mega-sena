@@ -1,6 +1,10 @@
-//use std::iter::repeat_with;
-
-use actix_web::{get, web, Responder, Result};
+use axum::{
+    extract::Path,
+    http::StatusCode,
+    response::{IntoResponse, Response},
+    routing::get,
+    Json, Router,
+};
 use rand::{seq::SliceRandom, thread_rng};
 use serde::Serialize;
 
@@ -12,6 +16,12 @@ struct MsNumbers {
     n4: i32,
     n5: i32,
     n6: i32,
+}
+
+#[derive(Serialize)]
+struct Bets {
+    bet: u32,
+    numbers: MsNumbers,
 }
 
 impl MsNumbers {
@@ -34,19 +44,25 @@ impl MsNumbers {
     }
 }
 
-#[get("/bet")]
-async fn new_bet() -> Result<impl Responder> {
-    let numbers = MsNumbers::new();
+async fn new_bet(Path(num): Path<u32>) -> Response {
+    let mut vec_bets: Vec<Bets> = Vec::new();
 
-    Ok(web::Json(numbers))
+    for i in 1..=num {
+        let numbers = MsNumbers::new();
+
+        vec_bets.push(Bets { bet: i, numbers });
+    }
+    (StatusCode::OK, Json(vec_bets)).into_response()
 }
 
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
-    use actix_web::{App, HttpServer};
+#[tokio::main]
+async fn main() {
+    // build our application with a single route
+    let app = Router::new().route("/bet/:num", get(new_bet));
 
-    HttpServer::new(|| App::new().service(new_bet))
-        .bind(("127.0.0.1", 8080))?
-        .run()
+    // run it with hyper on localhost:3000
+    axum::Server::bind(&"0.0.0.0:8080".parse().unwrap())
+        .serve(app.into_make_service())
         .await
+        .unwrap();
 }
